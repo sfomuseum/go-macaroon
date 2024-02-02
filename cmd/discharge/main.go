@@ -26,11 +26,53 @@ func main() {
 		Days: []string{"Friday"},
 	}
 
-	err = m.Add3P(ka, "example.com", c)
+	tp_loc := "example.com"
+
+	err = m.Add3P(ka, tp_loc, c)
 
 	if err != nil {
 		log.Fatalf("Failed to add 3P, %v", err)
 	}
 
 	log.Println(m.String())
+
+	enc, err := sfomuseum.EncodeMacaroonAsBase64(m)
+
+	if err != nil {
+		log.Fatalf("Failed to encode macaroon, %v", err)
+	}
+
+	m2, err := sfomuseum.DecodeMacaroonFromBase64(enc)
+
+	if err != nil {
+		log.Fatalf("Failed to decode macaroon, %v", err)
+	}
+
+	// 3P/discharge
+
+	tp, err := m2.ThirdPartyTicket(tp_loc)
+
+	if err != nil {
+		log.Fatalf("Failed to get third party tickets, %v", err)
+	}
+
+	tp_caveats, tp_discharge, err := macaroon.DischargeTicket(ka, tp_loc, tp)
+
+	if err != nil {
+		log.Fatalf("Failed to parse discharge ticket, %v", err)
+	}
+
+	log.Println("TP", tp_caveats, tp_discharge)
+
+	//
+
+	cs, err := m2.Verify(key, [][]byte{}, nil)
+
+	if err != nil {
+		log.Fatalf("Failed to verify macaroon, %v", err)
+	}
+
+	for _, c := range cs.Caveats {
+		log.Println(c.Name())
+	}
 }
