@@ -1,6 +1,6 @@
 # go-macaroon
 
-Code for testing Macaroons and the superfly/macaroon package.
+Code for testing Macaroons and the [superfly/macaroon](https://pkg.go.dev/github.com/superfly/macaroon) package.
 
 ## Important
 
