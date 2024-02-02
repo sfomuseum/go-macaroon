@@ -7,6 +7,10 @@ import (
 	"github.com/superfly/macaroon"
 )
 
+func init() {
+	macaroon.RegisterCaveatType(&IsUserCaveat{})
+}
+
 type IsUserCaveat struct {
 	macaroon.Caveat
 	Users []string `json:"users"`

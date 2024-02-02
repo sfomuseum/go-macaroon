@@ -7,6 +7,10 @@ import (
 	"github.com/superfly/macaroon"
 )
 
+func init() {
+	macaroon.RegisterCaveatType(&HasRoleCaveat{})
+}
+
 type HasRoleCaveat struct {
 	macaroon.Caveat
 	Role string `json:"role"`
