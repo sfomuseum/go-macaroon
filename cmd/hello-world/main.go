@@ -5,108 +5,12 @@ package main
 
 import (
 	"encoding/base64"
-	"fmt"
 	"log"
 	"time"
 
+	"github.com/sfomuseum/go-macaroon/sfomuseum"
 	"github.com/superfly/macaroon"
 )
-
-// Caveats
-
-type IsUserCaveat struct {
-	macaroon.Caveat
-	Users []string `json:"users"`
-}
-
-func (c *IsUserCaveat) CaveatType() macaroon.CaveatType {
-	return macaroon.CavMinUserRegisterable + 1
-}
-
-func (c *IsUserCaveat) Name() string {
-	return "IsUserCaveat"
-}
-
-func (c *IsUserCaveat) Prohibits(f macaroon.Access) error {
-
-	wf, isWF := f.(*IsUserAccess)
-
-	if isWF {
-
-		is_user := false
-
-		for _, u := range c.Users {
-			if u == wf.User {
-				is_user = true
-				break
-			}
-		}
-
-		if !is_user {
-			return fmt.Errorf("Invalid user")
-		}
-	}
-
-	return nil
-}
-
-type HasRoleCaveat struct {
-	macaroon.Caveat
-	Role string `json:"role"`
-}
-
-func (c *HasRoleCaveat) CaveatType() macaroon.CaveatType {
-	return macaroon.CavMinUserRegisterable + 2
-}
-
-func (c *HasRoleCaveat) Name() string {
-	return "HasRoleCaveat"
-}
-
-func (c *HasRoleCaveat) Prohibits(f macaroon.Access) error {
-
-	wf, isWF := f.(*HasRoleAccess)
-
-	if isWF && wf.Role != c.Role {
-		return fmt.Errorf("Invalid role")
-	}
-
-	return nil
-}
-
-// Accesses
-// It is unclear to me what the purpose/requirement of the Validate method is...
-
-type IsUserAccess struct {
-	macaroon.Access
-	User string
-}
-
-func (a *IsUserAccess) Now() time.Time {
-	return time.Now()
-}
-
-func (a *IsUserAccess) Validate() error {
-	return nil
-}
-
-type HasRoleAccess struct {
-	macaroon.Access
-	Role string
-}
-
-func (a *HasRoleAccess) Now() time.Time {
-	return time.Now()
-}
-
-func (a *HasRoleAccess) Validate() error {
-	return nil
-}
-
-func init() {
-	macaroon.RegisterCaveatType(&HasRoleCaveat{})
-	macaroon.RegisterCaveatType(&IsUserCaveat{})
-}
 
 func main() {
 
@@ -133,13 +37,13 @@ func main() {
 
 	// Allowed users
 
-	c2 := &IsUserCaveat{
+	c2 := &sfomuseum.IsUserCaveat{
 		Users: []string{"bob", "alice"},
 	}
 
 	// Required role
 
-	c3 := &HasRoleCaveat{
+	c3 := &sfomuseum.HasRoleCaveat{
 		Role: "staff",
 	}
 
@@ -180,8 +84,8 @@ func main() {
 	}
 
 	err = cs.Validate(
-		&IsUserAccess{User: "alice"},
-		&HasRoleAccess{Role: "staff"},
+		&sfomuseum.IsUserAccess{User: "alice"},
+		&sfomuseum.HasRoleAccess{Role: "staff"},
 	)
 
 	if err != nil {
@@ -191,8 +95,8 @@ func main() {
 	log.Println("OK alice")
 
 	err = cs.Validate(
-		&IsUserAccess{User: "bob"},
-		&HasRoleAccess{Role: "staff"},
+		&sfomuseum.IsUserAccess{User: "bob"},
+		&sfomuseum.HasRoleAccess{Role: "staff"},
 	)
 
 	if err != nil {
@@ -202,8 +106,8 @@ func main() {
 	log.Println("OK bob")
 
 	err = cs.Validate(
-		&IsUserAccess{User: "doug"},
-		&HasRoleAccess{Role: "staff"},
+		&sfomuseum.IsUserAccess{User: "doug"},
+		&sfomuseum.HasRoleAccess{Role: "staff"},
 	)
 
 	if err == nil {
@@ -216,8 +120,8 @@ func main() {
 	time.Sleep(2 * time.Second)
 
 	err = cs.Validate(
-		&IsUserAccess{User: "bob"},
-		&HasRoleAccess{Role: "staff"},
+		&sfomuseum.IsUserAccess{User: "bob"},
+		&sfomuseum.HasRoleAccess{Role: "staff"},
 	)
 
 	if err == nil {
