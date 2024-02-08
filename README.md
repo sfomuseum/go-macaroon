@@ -1,6 +1,6 @@
 # go-macaroon
 
-Go package for working with Macaroons and the [superfly/macaroon](https://pkg.go.dev/github.com/superfly/macaroon) package.
+Go package for working with Macaroons and the [superfly/macaroon](https://pkg.go.dev/github.com/superfly/macaroon) package in an SFO Museum context.
 
 ## Documentation
 
