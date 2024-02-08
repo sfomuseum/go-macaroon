@@ -1,4 +1,4 @@
-// Append a third-party caveat to discharge an "ensure account" caveat to a Macaroon token and emit it as a base64-encoded string.
+// Append a "ensure account" caveat to discharge with a third-party to a Macaroon token and emit it as a base64-encoded string.
 package main
 
 import (
@@ -23,11 +23,17 @@ func main() {
 	var urlescape bool
 
 	flag.StringVar(&encryption_key_uri, "encryption-key-uri", "", "A valid sfomuseum/runtimevar URI that contains the shared encryption key for the third-party caveat.")
-	flag.StringVar(&loc, "location", "login.sfomuseum", "The 'location' string to associate with the Macaroon token.")
+	flag.StringVar(&loc, "location", "", "The 'location' string to associate with the Macaroon token.")
 	flag.Int64Var(&account_id, "account-id", 0, "The account ID to assign to the third-party caveat.")
 	flag.StringVar(&b64, "macaroon", "", "A base64-encoded string containing the Macaroon token to update. If the value is '-' then data will be read from STDIN.")
 	flag.BoolVar(&urlescape, "urlescape", false, "A boolean flag to URL unescape the base64-encoded Macaroon token being updated.")
 	flag.BoolVar(&urlunescape, "urlunescape", false, "A boolean flag to URL escape the final base64-encoded Macaroon token.")
+
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Append a \"ensure account\" caveat to discharge with a third-party to a Macaroon token and emit it as a base64-encoded string.\n")
+		fmt.Fprintf(os.Stderr, "Usage:\n\t %s [options]\n", os.Args[0])
+		flag.PrintDefaults()
+	}
 
 	flag.Parse()
 

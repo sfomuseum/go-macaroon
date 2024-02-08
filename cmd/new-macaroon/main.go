@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 
 	sfom_macaroon "github.com/sfomuseum/go-macaroon"
 )
@@ -22,6 +23,12 @@ func main() {
 	flag.StringVar(&duration, "duration", "PT10M", "A valid ISO8061 duration time used to set the time-to-live for the Macaroon token.")
 	flag.BoolVar(&urlescape, "urlescape", false, "A boolean flag to URL escape the final base64-encoded Macaroon token.")
 
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Generate a new Macaroon token and emit it as a base64-encoded string.\n")
+		fmt.Fprintf(os.Stderr, "Usage:\n\t %s [options]\n", os.Args[0])
+		flag.PrintDefaults()
+	}
+
 	flag.Parse()
 
 	ctx := context.Background()
@@ -31,7 +38,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to derive new macaroon URI, %v", err)
 	}
-	
+
 	m, err := sfom_macaroon.NewMacaroon(ctx, m_uri)
 
 	if err != nil {
