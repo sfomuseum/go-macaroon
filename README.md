@@ -4,7 +4,7 @@ Go package for working with Macaroons and the [superfly/macaroon](https://pkg.go
 
 ## Documentation
 
-Documentation is incomplete. Consult the tests and in particular [caveats/caveats_test.go](caveats/caveats_test.go) to get started.
+Documentation is incomplete. For the time being please consult the tests and in particular [caveats/caveats_test.go](caveats/caveats_test.go) to get started.
 
 ## Motivation
 
