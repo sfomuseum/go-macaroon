@@ -1,10 +1,10 @@
 # go-macaroon
 
-Code for testing Macaroons and the [superfly/macaroon](https://pkg.go.dev/github.com/superfly/macaroon) package.
+Go package for working with Macaroons and the [superfly/macaroon](https://pkg.go.dev/github.com/superfly/macaroon) package.
 
-## Important
+## Documentation
 
-This is not production code. It's not even useful package code. It is _example_ code to test using the parts of the [superfly/macaroon](https://pkg.go.dev/github.com/superfly/macaroon) package that aren't (don't seem to be) specific to the Fly.io service.
+Documentation is incomplete. Consult the tests and in particular [caveats/caveats_test.go](caveats/caveats_test.go) to get started.
 
 ## Motivation
 
@@ -24,36 +24,113 @@ So, buyer beware. I have gotten basic custom (non-Fly.io) caveat creation and te
 
 ## Tools
 
-### hello-world
-
-Demonstrate basic custom (non-Fly.io) caveat creation and access validation locally.
+### new-macaroon
 
 ```
-$> go run cmd/hello-world/main.go 
-2024/02/02 12:02:36 Expires 2024-02-02 12:02:46 -0800 PST
-2024/02/02 12:02:36 Sleeping...
-2024/02/02 12:02:45 OK alice
-2024/02/02 12:02:45 OK bob
-2024/02/02 12:02:45 DENY doug
-2024/02/02 12:02:45 Sleep again...
-2024/02/02 12:02:47 Failed to validate bob, unauthorized: token only valid until 2024-02-02 12:02:46 -0800 PST; unauthorized: token only valid until 2024-02-02 12:02:46 -0800 PST
+$> ./bin/new-macaroon -h
+Generate a new Macaroon token and emit it as a base64-encoded string.
+Usage:
+	 ./bin/new-macaroon [options]
+  -duration string
+    	A valid ISO8061 duration time used to set the time-to-live for the Macaroon token. (default "PT10M")
+  -location string
+    	The 'location' string to associate with the Macaroon token. (default "sfomuseum.org")
+  -signing-key-uri string
+    	A valid sfomuseum/runtimevar URI that contains the signing key for the Macaroon token.
+  -urlescape
+    	A boolean flag to URL escape the final base64-encoded Macaroon token.
 ```
 
-### tp-discharge
-
-Demonstrate basic custom (non-Fly.io) caveat creation and access validation locally and with a (simulated) third-party discharge exchange.
+For example:
 
 ```
-$> go run cmd/tp-discharge/main.go 
-2024/02/02 12:03:09 Sleeping 2 seconds to simulate exchanging macaroon
-2024/02/02 12:03:11 Sleeping 2 seconds to simulate sending discharge ticket
-2024/02/02 12:03:13 Sleeping 2 seconds to simulate receiving discharge token
-2024/02/02 12:03:15 All caveats validate
-2024/02/02 12:03:15 Sleeping 4 seconds to trigger expiration
-2024/02/02 12:03:19 Macaroon expired, unauthorized: token only valid until 2024-02-02 12:03:19 -0800 PST; unauthorized: token only valid until 2024-02-02 12:03:19 -0800 PST
+$> ./bin/new-macaroon -signing-key-uri file:///usr/local/sfomuseum/go-macaroon/fixtures/signing.key
+lJPAxBDUE507S463PTwmomfDUVIlwq1zZm9tdXNldW0ub3JnkgSSzmXFQLPOZcVDC8Qgp8rB2CYGZ0o6El7wOQtnfcgMB80FvT3Vv2If5Pj6hss=
+```
+
+See also:
+
+* https://github.com/sfomuseum/runtimevar
+
+### tp-ensure-account
+
+Append a "ensure account" caveat to discharge with a third-party to a Macaroon token and emit it as a base64-encoded string.
+
+```
+$> ./bin/tp-ensure-account -h
+Append a "ensure account" caveat to discharge with a third-party to a Macaroon token and emit it as a base64-encoded string.
+Usage:
+	 ./bin/tp-ensure-account [options]
+  -account-id int
+    	The account ID to assign to the third-party caveat.
+  -encryption-key-uri string
+    	A valid sfomuseum/runtimevar URI that contains the shared encryption key for the third-party caveat.
+  -location string
+    	The 'location' string to associate with the Macaroon token. (default "")
+  -macaroon string
+    	A base64-encoded string containing the Macaroon token to update. If the value is '-' then data will be read from STDIN.
+  -urlescape
+    	A boolean flag to URL unescape the base64-encoded Macaroon token being updated.
+  -urlunescape
+    	A boolean flag to URL escape the final base64-encoded Macaroon token.
+```
+
+For example (reading data from `STDIN`):
+
+```
+$> ./bin/new-macaroon \
+	-signing-key-uri file:///usr/local/sfomuseum/go-macaroon/fixtures/signing.key \
+	-duration PT30S \
+	| \
+	./bin/tp-ensure-account -encryption-key-uri file:///usr/local/sfomuseum/go-macaroon/fixtures/3p-encryption.key \
+	-location example.com \
+	-macaroon -
+
+lJPAxBA2ZfumuM+3ye8ksRwEfMqKwq1zZm9tdXNldW0ub3JnlASSzmXFQwfOZcVDJQuTq2V4YW1wbGUuY29txDxfN+zomqLyS1MH2w5OkYRKPFnz7d6UwLBbbYiOLdd9qIhlnzz+B9HuuzIYQcqjlEjDpFo+2kzNTALYxrzETp0uDb6u3XHQ5nx4xDM8I6zNOr9skiIUpLWlGQWc32rL56ILzSBSfIUvVkngOEuyG/bY58s2KQltpggV4IsGNwE4IhyjWB+zns8fW8C09MQghGB+25sWgzazuqI0sLNAd4in5pUves6nT179GjL1HY0=
+```
+
+See also
+
+* https://github.com/sfomuseum/runtimevar
+
+### signing-key
+
+Generate a random base64-encoded Macaroon signing key.
+
+```
+$> ./bin/signing-key -h
+Generate a random base64-encoded Macaroon signing key.
+Usage:
+	 ./bin/signing-key
+```
+
+For example:
+
+```
+$> ./bin/signing-key 
+SLDGG+DU9wAXQz5l1bYmymEhyRpEyK1f4wrXs58N4iw=
+```
+
+### encryption-key
+
+Generate a random base64-encoded Macaroon encyption key.
+
+```
+$> ./bin/encryption-key -h
+Generate a random base64-encoded Macaroon encyption key.
+Usage:
+	 ./bin/encryption-key
+```
+
+For example:
+
+```
+$> ./bin/encryption-key 
+hMonc06ho508zB+Hn3N70jg7kkKvJu3IrDZxJxcgSrQ=
 ```
 
 ## See also
 
 * https://pkg.go.dev/github.com/superfly/macaroon
 * https://fly.io/blog/macaroons-escalated-quickly/
+* https://github.com/sfomuseum/runtimevar
