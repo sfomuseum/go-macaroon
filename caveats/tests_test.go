@@ -6,7 +6,6 @@ package caveats
 import (
 	"context"
 	"fmt"
-	"log"
 	"path/filepath"
 	"testing"
 	"time"
@@ -28,7 +27,7 @@ func TestSFOMuseumCaveats(t *testing.T) {
 	key_uri := fmt.Sprintf("file://%s", path_key)
 
 	loc := "sfomuseum.org"
-	duration := "PT1M"
+	duration := "PT10S"
 
 	m_uri, err := sfom_macaroon.NewMacaroonURI(loc, key_uri, duration)
 
@@ -42,14 +41,32 @@ func TestSFOMuseumCaveats(t *testing.T) {
 		t.Fatalf("Failed to create new macaroon, %v", err)
 	}
 
+	// Allowed users
+
+	c1 := &isUserCaveat{
+		Users: []string{"bob", "alice"},
+	}
+
+	// Required role
+
+	c2 := &hasRoleCaveat{
+		Role: "staff",
+	}
+
+	err = m.Add(c1, c2)
+
+	if err != nil {
+		t.Fatalf("Failed to add caveats, %v", err)
+	}
+
 	enc, err := sfom_macaroon.EncodeMacaroonAsBase64(m, false)
 
 	if err != nil {
 		t.Fatalf("Failed to encode, %v", err)
 	}
 
-	fmt.Println("Expires", m.Expiration())
-	fmt.Println("Sleeping...")
+	fmt.Printf("Macaroon expires %v\n", m.Expiration())
+	fmt.Println("Sleeping 9 seconds...")
 	time.Sleep(9 * time.Second)
 
 	m2, err := sfom_macaroon.DecodeMacaroonFromBase64(enc, false)
@@ -101,9 +118,9 @@ func TestSFOMuseumCaveats(t *testing.T) {
 		t.Fatalf("NO DOUG FOR YOU")
 	}
 
-	fmt.Println("DENY doug")
+	fmt.Println("DENY doug (this is good)")
 
-	fmt.Println("Sleep again...")
+	fmt.Println("Sleep again 2 seconds...")
 	time.Sleep(2 * time.Second)
 
 	err = cs.Validate(
@@ -112,8 +129,12 @@ func TestSFOMuseumCaveats(t *testing.T) {
 	)
 
 	if err == nil {
-		t.Fatalf("SHOULD HAVE EXPIRED")
+		t.Fatalf("Macaroon should have expired")
 	}
 
-	log.Printf("Failed to validate bob, %v\n", err)
+	fmt.Printf("Failed to validate bob, %v (this is good)\n", err)
+
+	if !sfom_macaroon.IsExpired(m2) {
+		t.Fatalf("Macaroon should be expired")
+	}
 }
