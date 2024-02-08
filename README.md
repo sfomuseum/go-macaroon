@@ -48,6 +48,8 @@ $> ./bin/new-macaroon -signing-key-uri file:///usr/local/sfomuseum/go-macaroon/f
 lJPAxBDUE507S463PTwmomfDUVIlwq1zZm9tdXNldW0ub3JnkgSSzmXFQLPOZcVDC8Qgp8rB2CYGZ0o6El7wOQtnfcgMB80FvT3Vv2If5Pj6hss=
 ```
 
+It is important to note that this produces a Macaroon token with nothing more than a "time-to-live" caveat and it is up to you to update it with additional caveats as necessary.
+
 See also:
 
 * https://github.com/sfomuseum/runtimevar
