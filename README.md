@@ -1,6 +1,6 @@
 # go-macaroon
 
-Code for testing Macaroons and the [superfly/macaroon](https://pkg.go.dev/github.com/superfly/macaroon) package.
+Go package for working with Macaroons and the [superfly/macaroon](https://pkg.go.dev/github.com/superfly/macaroon) package.
 
 ## Documentation
 
@@ -48,6 +48,10 @@ $> ./bin/new-macaroon -signing-key-uri file:///usr/local/sfomuseum/go-macaroon/f
 lJPAxBDUE507S463PTwmomfDUVIlwq1zZm9tdXNldW0ub3JnkgSSzmXFQLPOZcVDC8Qgp8rB2CYGZ0o6El7wOQtnfcgMB80FvT3Vv2If5Pj6hss=
 ```
 
+See also:
+
+* https://github.com/sfomuseum/runtimevar
+
 ### tp-ensure-account
 
 Append a "ensure account" caveat to discharge with a third-party to a Macaroon token and emit it as a base64-encoded string.
@@ -76,13 +80,18 @@ For example (reading data from `STDIN`):
 ```
 $> ./bin/new-macaroon \
 	-signing-key-uri file:///usr/local/sfomuseum/go-macaroon/fixtures/signing.key \
+	-duration PT30S \
 	| \
 	./bin/tp-ensure-account -encryption-key-uri file:///usr/local/sfomuseum/go-macaroon/fixtures/3p-encryption.key \
 	-location example.com \
 	-macaroon -
-	
-lJPAxBDq6a331g0AN9K/s5cYR75Twq1zZm9tdXNldW0ub3JnlASSzmXFQYbOZcVD3guTq2V4YW1wbGUuY29txDyLXWCpuis68q3lsm7hAJPjNBAJlSGlxRWK7ffaCJuvxOkqd0zI7CN+z3V/8olVHggdzrclZ2kzYvYsdjvETkZloAuH5jt5b4Plf+0wMZbjgwrubXFmPi/Bnhl7qzy0jkQz3zIWvEylzqRe5YYTyskoVxW25w3NBWBb8LgEa/HeM+4C0Ti46ShGfZKiHcQgKNj01GuAbK3lapAbt2M0Lk9cFDj2vxnWA97JdE6lRXo=
+
+lJPAxBA2ZfumuM+3ye8ksRwEfMqKwq1zZm9tdXNldW0ub3JnlASSzmXFQwfOZcVDJQuTq2V4YW1wbGUuY29txDxfN+zomqLyS1MH2w5OkYRKPFnz7d6UwLBbbYiOLdd9qIhlnzz+B9HuuzIYQcqjlEjDpFo+2kzNTALYxrzETp0uDb6u3XHQ5nx4xDM8I6zNOr9skiIUpLWlGQWc32rL56ILzSBSfIUvVkngOEuyG/bY58s2KQltpggV4IsGNwE4IhyjWB+zns8fW8C09MQghGB+25sWgzazuqI0sLNAd4in5pUves6nT179GjL1HY0=
 ```
+
+See also
+
+* https://github.com/sfomuseum/runtimevar
 
 ### signing-key
 
@@ -124,3 +133,4 @@ hMonc06ho508zB+Hn3N70jg7kkKvJu3IrDZxJxcgSrQ=
 
 * https://pkg.go.dev/github.com/superfly/macaroon
 * https://fly.io/blog/macaroons-escalated-quickly/
+* https://github.com/sfomuseum/runtimevar
