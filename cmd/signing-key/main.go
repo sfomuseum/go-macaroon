@@ -1,3 +1,4 @@
+// Generate a random Base64-encoded Macaroon signing key.
 package main
 
 import (

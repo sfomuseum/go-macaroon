@@ -2,6 +2,7 @@ package caveats
 
 import (
 	"fmt"
+	"slices"
 	"time"
 
 	flyio_macaroon "github.com/superfly/macaroon"
@@ -14,7 +15,8 @@ func init() {
 type EnsureAccountCaveat struct {
 	flyio_macaroon.Caveat
 	AccountId int64    `json:"account_id"`
-	Roles     []string `json:"roles,omitempty"`
+	RolesAny  []string `json:"roles_any,omitempty"`
+	RolesAll  []string `json:"roles_all,omitempty"`
 }
 
 func (c *EnsureAccountCaveat) CaveatType() flyio_macaroon.CaveatType {
@@ -34,6 +36,29 @@ func (c *EnsureAccountCaveat) Prohibits(f flyio_macaroon.Access) error {
 		if access.AccountId != c.AccountId {
 			return fmt.Errorf("Invalid account")
 		}
+
+		if len(c.RolesAll) > 0 {
+
+			if !slices.Equal(c.RolesAll, access.Roles) {
+				return fmt.Errorf("Insufficient roles")
+			}
+		}
+
+		if len(c.RolesAny) > 0 {
+
+			has_role := false
+
+			for _, r := range access.Roles {
+				if slices.Contains(c.RolesAny, r) {
+					has_role = true
+					break
+				}
+			}
+
+			if !has_role {
+				return fmt.Errorf("Invalid role")
+			}
+		}
 	}
 
 	return nil
@@ -42,6 +67,7 @@ func (c *EnsureAccountCaveat) Prohibits(f flyio_macaroon.Access) error {
 type EnsureAccountAccess struct {
 	flyio_macaroon.Access
 	AccountId int64
+	Roles     []string
 }
 
 func (a *EnsureAccountAccess) Now() time.Time {

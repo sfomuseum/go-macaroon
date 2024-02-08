@@ -1,8 +1,6 @@
 module github.com/sfomuseum/go-macaroon
 
-go 1.22rc2
-
-toolchain go1.22.0
+go 1.22
 
 require (
 	github.com/sfomuseum/iso8601duration v1.1.0

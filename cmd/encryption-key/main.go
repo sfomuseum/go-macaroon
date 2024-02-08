@@ -1,3 +1,4 @@
+// Generate a random Base64-encoded Macaroon encyption key.
 package main
 
 import (
