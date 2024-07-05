@@ -1,5 +1,5 @@
-# github.com/aaronland/go-aws-auth v1.3.0
-## explicit; go 1.22rc2
+# github.com/aaronland/go-aws-auth v1.3.1
+## explicit; go 1.18
 github.com/aaronland/go-aws-auth
 # github.com/aws/aws-sdk-go v1.49.0
 ## explicit; go 1.19
@@ -191,15 +191,15 @@ github.com/jmespath/go-jmespath
 # github.com/sfomuseum/iso8601duration v1.1.0
 ## explicit; go 1.18
 github.com/sfomuseum/iso8601duration
-# github.com/sfomuseum/runtimevar v1.1.4
-## explicit; go 1.22rc2
+# github.com/sfomuseum/runtimevar v1.2.0
+## explicit; go 1.18
 github.com/sfomuseum/runtimevar
-# github.com/superfly/macaroon v0.2.10
+# github.com/superfly/macaroon v0.2.13
 ## explicit; go 1.20
 github.com/superfly/macaroon
 github.com/superfly/macaroon/internal/merr
-# github.com/vmihailenco/msgpack/v5 v5.4.1
-## explicit; go 1.19
+# github.com/vmihailenco/msgpack/v5 v5.3.5
+## explicit; go 1.11
 github.com/vmihailenco/msgpack/v5
 github.com/vmihailenco/msgpack/v5/msgpcode
 # github.com/vmihailenco/tagparser/v2 v2.0.0

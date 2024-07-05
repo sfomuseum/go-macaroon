@@ -4,12 +4,12 @@ go 1.22
 
 require (
 	github.com/sfomuseum/iso8601duration v1.1.0
-	github.com/sfomuseum/runtimevar v1.1.4
-	github.com/superfly/macaroon v0.2.10
+	github.com/sfomuseum/runtimevar v1.2.0
+	github.com/superfly/macaroon v0.2.13
 )
 
 require (
-	github.com/aaronland/go-aws-auth v1.3.0 // indirect
+	github.com/aaronland/go-aws-auth v1.3.1 // indirect
 	github.com/aws/aws-sdk-go v1.49.0 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.24.1 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.26.6 // indirect
@@ -35,7 +35,7 @@ require (
 	github.com/google/wire v0.5.0 // indirect
 	github.com/googleapis/gax-go/v2 v2.12.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
-	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
+	github.com/vmihailenco/msgpack/v5 v5.3.5 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	gocloud.dev v0.36.0 // indirect
