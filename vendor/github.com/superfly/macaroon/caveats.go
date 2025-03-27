@@ -1,6 +1,7 @@
 package macaroon
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -16,6 +17,33 @@ type Caveat3P struct {
 
 	// HMAC key for 3P caveat
 	rn []byte `msgpack:"-"`
+}
+
+func NewCaveat3P(ka EncryptionKey, loc string, cs ...Caveat) (*Caveat3P, error) {
+	if len(ka) != EncryptionKeySize {
+		return nil, fmt.Errorf("bad key size: have %d, need %d", len(ka), EncryptionKeySize)
+	}
+
+	// make a new root hmac key for the 3p discharge macaroon
+	rn := NewSigningKey()
+
+	// make the ticket, which is consumed by the 3p service; then
+	// encode and encrypt it
+	ticket := &wireTicket{
+		DischargeKey: rn,
+		Caveats:      *NewCaveatSet(cs...),
+	}
+
+	ticketBytes, err := encode(ticket)
+	if err != nil {
+		return nil, fmt.Errorf("encoding ticket: %w", err)
+	}
+
+	return &Caveat3P{
+		Location: loc,
+		Ticket:   seal(ka, ticketBytes),
+		rn:       rn,
+	}, nil
 }
 
 func init()                                { RegisterCaveatType(&Caveat3P{}) }
@@ -99,8 +127,17 @@ func (c UnregisteredCaveat) MarshalMsgpack() ([]byte, error) {
 }
 
 func (c *UnregisteredCaveat) UnmarshalMsgpack(data []byte) error {
+	dec := msgpack.GetDecoder()
+	defer msgpack.PutDecoder(dec)
+
+	dec.Reset(bytes.NewReader(data))
+	dec.SetMapDecoder(func(d *msgpack.Decoder) (interface{}, error) {
+		return d.DecodeUntypedMap()
+	})
+
 	c.RawMsgpack = data
-	return msgpack.Unmarshal(data, &c.Body)
+
+	return dec.Decode(&c.Body)
 }
 
 func (c UnregisteredCaveat) MarshalJSON() ([]byte, error) {
