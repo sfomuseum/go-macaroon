@@ -226,7 +226,7 @@ func TestSFOMuseumThirdPartyCaveats(t *testing.T) {
 	// START OF third-party discharges
 
 	discharges := make([][]byte, 0)
-	discharge_keys := make(map[string]flyio_macaroon.EncryptionKey)
+	discharge_keys := make(map[string][]flyio_macaroon.EncryptionKey)
 
 	tp, err := m2.ThirdPartyTicket(tp_loc)
 
@@ -268,7 +268,9 @@ func TestSFOMuseumThirdPartyCaveats(t *testing.T) {
 	time.Sleep(2 * time.Second)
 
 	discharges = append(discharges, encd)
-	discharge_keys[tp_loc] = shared_key
+	discharge_keys[tp_loc] = []flyio_macaroon.EncryptionKey{
+		shared_key,
+	}
 
 	// END OF third-party discharges
 

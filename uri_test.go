@@ -2,25 +2,26 @@ package macaroon
 
 import (
 	"fmt"
+	"net/url"
 	"path/filepath"
 	"testing"
 )
 
 func TestNewMacaroonURI(t *testing.T) {
 
-	expected := "macaroon://sfomuseum.org?duration=PT1M&key=file%3A%2F%2F%2Fusr%2Flocal%2Fsfomuseum%2Fgo-macaroon%2Ffixtures%2Fsigning.key"
-
-	abs_path, err := filepath.Abs(".")
+	abs_path, err := filepath.Abs("fixtures/signing.key")
 
 	if err != nil {
-		t.Fatalf("Failed to derive absolute path, %v", err)
+		t.Fatalf("Failed to derive absolute path for signing key, %v", err)
 	}
 
-	path_key := filepath.Join(abs_path, "fixtures/signing.key")
-	key_uri := fmt.Sprintf("file://%s", path_key)
+	key_uri := fmt.Sprintf("file://%s", abs_path)
+	enc_uri := url.QueryEscape(key_uri)
 
 	loc := "sfomuseum.org"
 	duration := "PT1M"
+
+	expected := fmt.Sprintf("macaroon://%s?duration=%s&key=%s", loc, duration, enc_uri)
 
 	m_uri, err := NewMacaroonURI(loc, key_uri, duration)
 
