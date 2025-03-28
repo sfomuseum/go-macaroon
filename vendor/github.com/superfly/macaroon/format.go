@@ -8,26 +8,21 @@ import (
 )
 
 const (
-	authorizationScheme  = "FlyV1"
-	permissionTokenLabel = "fm1r"
-	dischargeTokenLabel  = "fm1a"
-	v2TokenLabel         = "fm2"
+	AuthorizationSchemeFlyV1  = "FlyV1"
+	authorizationSchemeBearer = "Bearer"
+	permissionTokenLabel      = "fm1r"
+	dischargeTokenLabel       = "fm1a"
+	v2TokenLabel              = "fm2"
+	oauthTokenLabel           = "fo1"
 )
 
 // Parses an Authorization header into its constituent tokens.
 func Parse(header string) ([][]byte, error) {
-	parts := strings.Split(header, " ")
-
-	switch {
-	case len(parts) == 2 && parts[0] == authorizationScheme:
-		header = parts[1]
-	case len(parts) != 1:
-		return nil, fmt.Errorf("malformed header: %w", ErrUnrecognizedToken)
-	}
-
+	header, _ = StripAuthorizationScheme(header)
 	strToks := strings.Split(header, ",")
 	toks := make([][]byte, 0, len(strToks))
 
+tokLoop:
 	for _, tok := range strToks {
 		pfx, b64, found := strings.Cut(tok, "_")
 		if !found {
@@ -36,6 +31,8 @@ func Parse(header string) ([][]byte, error) {
 
 		switch pfx {
 		case permissionTokenLabel, dischargeTokenLabel, v2TokenLabel:
+		case oauthTokenLabel:
+			continue tokLoop
 		default:
 			return nil, fmt.Errorf("parse token: invalid token prefix '%s': %w", pfx, ErrUnrecognizedToken)
 		}
@@ -53,7 +50,7 @@ func Parse(header string) ([][]byte, error) {
 	}
 
 	if len(toks) == 0 {
-		return nil, fmt.Errorf("parse tokens: no valid tokens found")
+		return nil, fmt.Errorf("parse tokens: no valid tokens found: %w", ErrUnrecognizedToken)
 	}
 
 	return toks, nil
@@ -103,7 +100,7 @@ func FindPermissionAndDischargeTokens(tokens [][]byte, location string) ([]*Maca
 // ToAuthorizationHeader formats a collection of tokens as an HTTP
 // Authorization header.
 func ToAuthorizationHeader(toks ...[]byte) string {
-	return authorizationScheme + " " + encodeTokens(toks...)
+	return AuthorizationSchemeFlyV1 + " " + encodeTokens(toks...)
 }
 
 func encodeTokens(toks ...[]byte) string {
@@ -116,4 +113,22 @@ func encodeTokens(toks ...[]byte) string {
 	}
 
 	return ret
+}
+
+// stripAuthorizationScheme strips any FlyV1/Bearer schemes from token header.
+func StripAuthorizationScheme(hdr string) (string, bool) {
+	hdr = strings.TrimSpace(hdr)
+
+	pfx, rest, found := strings.Cut(hdr, " ")
+	if !found {
+		return hdr, false
+	}
+
+	switch pfx = strings.TrimSpace(pfx); {
+	case strings.EqualFold(pfx, authorizationSchemeBearer), strings.EqualFold(pfx, AuthorizationSchemeFlyV1):
+		hdr, _ = StripAuthorizationScheme(rest)
+		return hdr, true
+	default:
+		return hdr, false
+	}
 }

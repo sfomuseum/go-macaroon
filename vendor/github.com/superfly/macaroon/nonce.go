@@ -1,6 +1,7 @@
 package macaroon
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/google/uuid"
@@ -44,7 +45,7 @@ const (
 var kidNamespace = uuid.MustParse("968fc2c6-a94f-4988-a544-2ad72b02f222")
 
 // UUID is a simple globally unique identifier string for a nonce.
-func (n *Nonce) UUID() uuid.UUID {
+func (n Nonce) UUID() uuid.UUID {
 	kidUUID := uuid.NewSHA1(kidNamespace, n.KID)
 	rndUUID := uuid.NewSHA1(kidUUID, n.Rnd)
 	return rndUUID
@@ -110,6 +111,24 @@ func (n Nonce) MustEncode() []byte {
 	}
 
 	return b
+}
+
+func (n Nonce) MarshalJSON() ([]byte, error) {
+	raw, err := msgpack.Marshal(&n)
+	if err != nil {
+		return nil, err
+	}
+
+	return json.Marshal(raw)
+}
+
+func (c *Nonce) UnmarshalJSON(b []byte) error {
+	var raw []byte
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+
+	return msgpack.Unmarshal(raw, c)
 }
 
 // newNonce creates a nonce from a key-id, where the key-id
