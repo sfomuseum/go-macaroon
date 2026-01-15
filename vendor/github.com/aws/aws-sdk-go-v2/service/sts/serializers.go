@@ -226,6 +226,76 @@ func (m *awsAwsquery_serializeOpAssumeRoleWithWebIdentity) HandleSerialize(ctx c
 	return next.HandleSerialize(ctx, in)
 }
 
+type awsAwsquery_serializeOpAssumeRoot struct {
+}
+
+func (*awsAwsquery_serializeOpAssumeRoot) ID() string {
+	return "OperationSerializer"
+}
+
+func (m *awsAwsquery_serializeOpAssumeRoot) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
+	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
+) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
+	request, ok := in.Request.(*smithyhttp.Request)
+	if !ok {
+		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
+	}
+
+	input, ok := in.Parameters.(*AssumeRootInput)
+	_ = input
+	if !ok {
+		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown input parameters type %T", in.Parameters)}
+	}
+
+	operationPath := "/"
+	if len(request.Request.URL.Path) == 0 {
+		request.Request.URL.Path = operationPath
+	} else {
+		request.Request.URL.Path = path.Join(request.Request.URL.Path, operationPath)
+		if request.Request.URL.Path != "/" && operationPath[len(operationPath)-1] == '/' {
+			request.Request.URL.Path += "/"
+		}
+	}
+	request.Request.Method = "POST"
+	httpBindingEncoder, err := httpbinding.NewEncoder(request.URL.Path, request.URL.RawQuery, request.Header)
+	if err != nil {
+		return out, metadata, &smithy.SerializationError{Err: err}
+	}
+	httpBindingEncoder.SetHeader("Content-Type").String("application/x-www-form-urlencoded")
+
+	bodyWriter := bytes.NewBuffer(nil)
+	bodyEncoder := query.NewEncoder(bodyWriter)
+	body := bodyEncoder.Object()
+	body.Key("Action").String("AssumeRoot")
+	body.Key("Version").String("2011-06-15")
+
+	if err := awsAwsquery_serializeOpDocumentAssumeRootInput(input, bodyEncoder.Value); err != nil {
+		return out, metadata, &smithy.SerializationError{Err: err}
+	}
+
+	err = bodyEncoder.Encode()
+	if err != nil {
+		return out, metadata, &smithy.SerializationError{Err: err}
+	}
+
+	if request, err = request.SetStream(bytes.NewReader(bodyWriter.Bytes())); err != nil {
+		return out, metadata, &smithy.SerializationError{Err: err}
+	}
+
+	if request.Request, err = httpBindingEncoder.Encode(request.Request); err != nil {
+		return out, metadata, &smithy.SerializationError{Err: err}
+	}
+	in.Request = request
+
+	endTimer()
+	span.End()
+	return next.HandleSerialize(ctx, in)
+}
+
 type awsAwsquery_serializeOpDecodeAuthorizationMessage struct {
 }
 
@@ -412,6 +482,76 @@ func (m *awsAwsquery_serializeOpGetCallerIdentity) HandleSerialize(ctx context.C
 	body := bodyEncoder.Object()
 	body.Key("Action").String("GetCallerIdentity")
 	body.Key("Version").String("2011-06-15")
+
+	err = bodyEncoder.Encode()
+	if err != nil {
+		return out, metadata, &smithy.SerializationError{Err: err}
+	}
+
+	if request, err = request.SetStream(bytes.NewReader(bodyWriter.Bytes())); err != nil {
+		return out, metadata, &smithy.SerializationError{Err: err}
+	}
+
+	if request.Request, err = httpBindingEncoder.Encode(request.Request); err != nil {
+		return out, metadata, &smithy.SerializationError{Err: err}
+	}
+	in.Request = request
+
+	endTimer()
+	span.End()
+	return next.HandleSerialize(ctx, in)
+}
+
+type awsAwsquery_serializeOpGetDelegatedAccessToken struct {
+}
+
+func (*awsAwsquery_serializeOpGetDelegatedAccessToken) ID() string {
+	return "OperationSerializer"
+}
+
+func (m *awsAwsquery_serializeOpGetDelegatedAccessToken) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
+	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
+) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
+	request, ok := in.Request.(*smithyhttp.Request)
+	if !ok {
+		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
+	}
+
+	input, ok := in.Parameters.(*GetDelegatedAccessTokenInput)
+	_ = input
+	if !ok {
+		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown input parameters type %T", in.Parameters)}
+	}
+
+	operationPath := "/"
+	if len(request.Request.URL.Path) == 0 {
+		request.Request.URL.Path = operationPath
+	} else {
+		request.Request.URL.Path = path.Join(request.Request.URL.Path, operationPath)
+		if request.Request.URL.Path != "/" && operationPath[len(operationPath)-1] == '/' {
+			request.Request.URL.Path += "/"
+		}
+	}
+	request.Request.Method = "POST"
+	httpBindingEncoder, err := httpbinding.NewEncoder(request.URL.Path, request.URL.RawQuery, request.Header)
+	if err != nil {
+		return out, metadata, &smithy.SerializationError{Err: err}
+	}
+	httpBindingEncoder.SetHeader("Content-Type").String("application/x-www-form-urlencoded")
+
+	bodyWriter := bytes.NewBuffer(nil)
+	bodyEncoder := query.NewEncoder(bodyWriter)
+	body := bodyEncoder.Object()
+	body.Key("Action").String("GetDelegatedAccessToken")
+	body.Key("Version").String("2011-06-15")
+
+	if err := awsAwsquery_serializeOpDocumentGetDelegatedAccessTokenInput(input, bodyEncoder.Value); err != nil {
+		return out, metadata, &smithy.SerializationError{Err: err}
+	}
 
 	err = bodyEncoder.Encode()
 	if err != nil {
@@ -821,6 +961,30 @@ func awsAwsquery_serializeOpDocumentAssumeRoleWithWebIdentityInput(v *AssumeRole
 	return nil
 }
 
+func awsAwsquery_serializeOpDocumentAssumeRootInput(v *AssumeRootInput, value query.Value) error {
+	object := value.Object()
+	_ = object
+
+	if v.DurationSeconds != nil {
+		objectKey := object.Key("DurationSeconds")
+		objectKey.Integer(*v.DurationSeconds)
+	}
+
+	if v.TargetPrincipal != nil {
+		objectKey := object.Key("TargetPrincipal")
+		objectKey.String(*v.TargetPrincipal)
+	}
+
+	if v.TaskPolicyArn != nil {
+		objectKey := object.Key("TaskPolicyArn")
+		if err := awsAwsquery_serializeDocumentPolicyDescriptorType(v.TaskPolicyArn, objectKey); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func awsAwsquery_serializeOpDocumentDecodeAuthorizationMessageInput(v *DecodeAuthorizationMessageInput, value query.Value) error {
 	object := value.Object()
 	_ = object
@@ -848,6 +1012,18 @@ func awsAwsquery_serializeOpDocumentGetAccessKeyInfoInput(v *GetAccessKeyInfoInp
 func awsAwsquery_serializeOpDocumentGetCallerIdentityInput(v *GetCallerIdentityInput, value query.Value) error {
 	object := value.Object()
 	_ = object
+
+	return nil
+}
+
+func awsAwsquery_serializeOpDocumentGetDelegatedAccessTokenInput(v *GetDelegatedAccessTokenInput, value query.Value) error {
+	object := value.Object()
+	_ = object
+
+	if v.TradeInToken != nil {
+		objectKey := object.Key("TradeInToken")
+		objectKey.String(*v.TradeInToken)
+	}
 
 	return nil
 }

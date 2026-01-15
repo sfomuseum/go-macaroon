@@ -5,7 +5,7 @@ import (
 	"encoding/base64"
 	"fmt"
 
-	"github.com/sfomuseum/runtimevar"
+	"github.com/aaronland/gocloud/runtimevar"
 	flyio_macaroon "github.com/superfly/macaroon"
 )
 

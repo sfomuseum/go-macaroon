@@ -15,11 +15,10 @@ import (
 // Generates an activation code and activation ID you can use to register your
 // on-premises servers, edge devices, or virtual machine (VM) with Amazon Web
 // Services Systems Manager. Registering these machines with Systems Manager makes
-// it possible to manage them using Systems Manager capabilities. You use the
-// activation code and ID when installing SSM Agent on machines in your hybrid
-// environment. For more information about requirements for managing on-premises
-// machines using Systems Manager, see [Using Amazon Web Services Systems Manager in hybrid and multicloud environments]in the Amazon Web Services Systems Manager
-// User Guide.
+// it possible to manage them using Systems Manager tools. You use the activation
+// code and ID when installing SSM Agent on machines in your hybrid environment.
+// For more information about requirements for managing on-premises machines using
+// Systems Manager, see [Using Amazon Web Services Systems Manager in hybrid and multicloud environments]in the Amazon Web Services Systems Manager User Guide.
 //
 // Amazon Elastic Compute Cloud (Amazon EC2) instances, edge devices, and
 // on-premises servers and VMs that are configured for Systems Manager are all
@@ -190,6 +189,9 @@ func (c *Client) addOperationCreateActivationMiddlewares(stack *middleware.Stack
 	if err = addUserAgentRetryMode(stack, options); err != nil {
 		return err
 	}
+	if err = addCredentialSource(stack, options); err != nil {
+		return err
+	}
 	if err = addOpCreateActivationValidationMiddleware(stack); err != nil {
 		return err
 	}
@@ -211,16 +213,13 @@ func (c *Client) addOperationCreateActivationMiddlewares(stack *middleware.Stack
 	if err = addDisableHTTPSMiddleware(stack, options); err != nil {
 		return err
 	}
-	if err = addSpanInitializeStart(stack); err != nil {
+	if err = addInterceptBeforeRetryLoop(stack, options); err != nil {
 		return err
 	}
-	if err = addSpanInitializeEnd(stack); err != nil {
+	if err = addInterceptAttempt(stack, options); err != nil {
 		return err
 	}
-	if err = addSpanBuildRequestStart(stack); err != nil {
-		return err
-	}
-	if err = addSpanBuildRequestEnd(stack); err != nil {
+	if err = addInterceptors(stack, options); err != nil {
 		return err
 	}
 	return nil

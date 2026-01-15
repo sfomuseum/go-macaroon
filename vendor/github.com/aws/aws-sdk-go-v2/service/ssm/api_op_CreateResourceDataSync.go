@@ -18,7 +18,7 @@ import (
 // You can configure Systems Manager Inventory to use the SyncToDestination type
 // to synchronize Inventory data from multiple Amazon Web Services Regions to a
 // single Amazon Simple Storage Service (Amazon S3) bucket. For more information,
-// see [Creatinga a resource data sync for Inventory]in the Amazon Web Services Systems Manager User Guide.
+// see [Creating a resource data sync for Inventory]in the Amazon Web Services Systems Manager User Guide.
 //
 // You can configure Systems Manager Explorer to use the SyncFromSource type to
 // synchronize operational work items (OpsItems) and operational data (OpsData)
@@ -38,7 +38,7 @@ import (
 // policy.
 //
 // [Setting up Systems Manager Explorer to display data from multiple accounts and Regions]: https://docs.aws.amazon.com/systems-manager/latest/userguide/Explorer-resource-data-sync.html
-// [Creatinga a resource data sync for Inventory]: https://docs.aws.amazon.com/systems-manager/latest/userguide/inventory-create-resource-data-sync.html
+// [Creating a resource data sync for Inventory]: https://docs.aws.amazon.com/systems-manager/latest/userguide/inventory-create-resource-data-sync.html
 func (c *Client) CreateResourceDataSync(ctx context.Context, params *CreateResourceDataSyncInput, optFns ...func(*Options)) (*CreateResourceDataSyncOutput, error) {
 	if params == nil {
 		params = &CreateResourceDataSyncInput{}
@@ -152,6 +152,9 @@ func (c *Client) addOperationCreateResourceDataSyncMiddlewares(stack *middleware
 	if err = addUserAgentRetryMode(stack, options); err != nil {
 		return err
 	}
+	if err = addCredentialSource(stack, options); err != nil {
+		return err
+	}
 	if err = addOpCreateResourceDataSyncValidationMiddleware(stack); err != nil {
 		return err
 	}
@@ -173,16 +176,13 @@ func (c *Client) addOperationCreateResourceDataSyncMiddlewares(stack *middleware
 	if err = addDisableHTTPSMiddleware(stack, options); err != nil {
 		return err
 	}
-	if err = addSpanInitializeStart(stack); err != nil {
+	if err = addInterceptBeforeRetryLoop(stack, options); err != nil {
 		return err
 	}
-	if err = addSpanInitializeEnd(stack); err != nil {
+	if err = addInterceptAttempt(stack, options); err != nil {
 		return err
 	}
-	if err = addSpanBuildRequestStart(stack); err != nil {
-		return err
-	}
-	if err = addSpanBuildRequestEnd(stack); err != nil {
+	if err = addInterceptors(stack, options); err != nil {
 		return err
 	}
 	return nil
